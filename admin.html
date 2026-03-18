@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="mg" translate="no">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="google" content="notranslate" />
+    <meta name="description" content="Admin — Fitantanana ny fandaharana" />
+    <title>Admin — Fandaharana</title>
+    
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#2563eb" />
+    <link rel="apple-touch-icon" href="./icon.png" />
+    <link rel="icon" type="image/png" href="./icon.png" />
+
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="spinner"></div>
+        <div class="loading-text">Miandry kely... (Chargement...)</div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Modal Overlay -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-title">Modal</h3>
+                <button class="btn-icon" onclick="closeModal()">
+                    <i data-lucide="x" style="width:20px;height:20px;"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+            <div class="modal-footer" id="modal-footer"></div>
+        </div>
+    </div>
+
+    <div class="app-layout">
+        <!-- ====== TOP NAVIGATION ====== -->
+        <nav class="top-nav">
+            <div class="nav-brand">
+                <div class="brand-icon">
+                    <i data-lucide="mic"></i>
+                </div>
+                <h2>Fandaharana</h2>
+                <span class="admin-badge">
+                    <i data-lucide="shield" style="width:12px;height:12px;"></i> Admin
+                </span>
+            </div>
+            <div class="nav-actions">
+                <div class="nav-user">
+                    <div class="user-avatar" id="nav-user-avatar">A</div>
+                    <div>
+                        <div class="user-name" id="nav-user-name">Admin</div>
+                        <div class="user-role">Admin</div>
+                    </div>
+                </div>
+                <button class="btn-icon" onclick="handleLogout()" title="Hivoaka">
+                    <i data-lucide="log-out" style="width:20px;height:20px;"></i>
+                </button>
+            </div>
+        </nav>
+
+        <!-- ====== MAIN CONTENT ====== -->
+        <main class="main-content">
+            <header class="greeting">
+                <h1 id="greeting-name">Salama Admin 👋</h1>
+                <p id="greeting-subtitle">Mode <span class="highlight">Administrateur</span> </p>
+            </header>
+
+            <!-- Admin Toolbar -->
+            <div class="admin-toolbar" id="admin-toolbar">
+                <h2>
+                    <i data-lucide="settings" style="width:20px;height:20px;"></i>
+                    Fitantanana ny fandaharana
+                </h2>
+                <div class="toolbar-actions">
+                    <button class="btn btn-secondary btn-sm" onclick="openPendingModal()" style="position:relative; margin-right: 8px;">
+                        <i data-lucide="shield-check" style="width:16px;height:16px;"></i> Fankatoavana (Approbations)
+                        <span id="pending-badge" style="display:none;position:absolute;top:-8px;right:-8px;background:var(--color-danger);color:white;border-radius:50%;width:20px;height:20px;font-size:11px;align-items:center;justify-content:center;">0</span>
+                    </button>
+                    <button class="btn btn-secondary btn-sm" onclick="openAddActivityModal()">
+                        <i data-lucide="plus" style="width:16px;height:16px;"></i> Asa vaovao
+                    </button>
+                </div>
+            </div>
+
+            <!-- Week Navigation -->
+            <div class="date-selector">
+                <button class="btn btn-icon" onclick="changeWeek(-1)">
+                    <i data-lucide="chevron-left" style="width:20px;height:20px;"></i>
+                </button>
+                <div class="date-display">
+                    <i data-lucide="calendar" style="width:18px;height:18px;"></i>
+                    <span id="week-label">--</span>
+                </div>
+                <button class="btn btn-icon" onclick="changeWeek(1)">
+                    <i data-lucide="chevron-right" style="width:20px;height:20px;"></i>
+                </button>
+                <button class="btn btn-secondary btn-sm btn-print" onclick="printSchedule()" title="Natonta (Imprimer)">
+                    <i data-lucide="printer" style="width:16px;height:16px;"></i> imprimer
+                </button>
+            </div>
+
+            <!-- Schedules Container (2 tables rendered by JS) -->
+            <div id="schedules-container"></div>
+        </main>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/schedule.js"></script>
+    <script>
+        // Init Service Worker pour PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js');
+            });
+        }
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>
