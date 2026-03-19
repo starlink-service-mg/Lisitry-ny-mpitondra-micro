@@ -307,6 +307,9 @@ async function loadAllSchedules() {
         const thursdayAssignments = assignments ? assignments.filter(a => a.schedule_date === thursdayStr) : [];
         const saturdayAssignments = assignments ? assignments.filter(a => a.schedule_date === saturdayStr) : [];
 
+        const thursdayActs = activities ? activities.filter(a => !a.day_type || a.day_type === 'roa' || a.day_type === 'alakamisy') : [];
+        const saturdayActs = activities ? activities.filter(a => !a.day_type || a.day_type === 'roa' || a.day_type === 'sabotsy') : [];
+
         // Render both tables
         container.innerHTML = `
             <div class="schedule-section">
@@ -327,7 +330,7 @@ async function loadAllSchedules() {
                             </tr>
                         </thead>
                         <tbody>
-                            ${renderTableBody(activities, thursdayAssignments, thursdayStr)}
+                            ${renderTableBody(thursdayActs, thursdayAssignments, thursdayStr)}
                         </tbody>
                     </table>
                 </div>
@@ -351,7 +354,7 @@ async function loadAllSchedules() {
                             </tr>
                         </thead>
                         <tbody>
-                            ${renderTableBody(activities, saturdayAssignments, saturdayStr)}
+                            ${renderTableBody(saturdayActs, saturdayAssignments, saturdayStr)}
                         </tbody>
                     </table>
                 </div>
@@ -595,6 +598,14 @@ function openAddActivityModal() {
             <input type="text" id="activity-name" placeholder="Ex: Vatosoa ara panahy" />
         </div>
         <div class="form-group">
+            <label for="activity-day">Andro (Jour)</label>
+            <select id="activity-day" style="width:100%;padding:10px;border:2px solid var(--color-border);border-radius:var(--radius-md);margin-bottom:15px;background:var(--color-card);color:var(--color-text-primary);">
+                <option value="roa">Roa (Alakamisy & Sabotsy)</option>
+                <option value="alakamisy">Alakamisy (Jeudi uniq.)</option>
+                <option value="sabotsy">Sabotsy (Samedi uniq.)</option>
+            </select>
+        </div>
+        <div class="form-group">
             <label for="activity-order">Laharana</label>
             <input type="number" id="activity-order" value="1" min="1" />
         </div>
@@ -613,10 +624,11 @@ function openAddActivityModal() {
 async function saveNewActivity() {
     const name = document.getElementById('activity-name').value.trim();
     const order = parseInt(document.getElementById('activity-order').value) || 1;
+    const dayType = document.getElementById('activity-day').value;
     if (!name) { showToast('Fenoy ny anarana azafady', 'error'); return; }
 
     try {
-        const { error } = await supabaseClient.from('activities').insert({ name, display_order: order });
+        const { error } = await supabaseClient.from('activities').insert({ name, display_order: order, day_type: dayType });
         if (error) throw error;
         closeModal();
         showToast('Asa vaovao nampidirina!', 'success');
@@ -692,7 +704,11 @@ async function printSchedule() {
             const dayAss = assignments ? assignments.filter(a => a.schedule_date === t.dateStr) : [];
             let rows = '';
             if (activities && activities.length > 0) {
-                activities.forEach(act => {
+                const filteredActs = t.type === 'thursday' 
+                    ? activities.filter(a => !a.day_type || a.day_type === 'roa' || a.day_type === 'alakamisy')
+                    : activities.filter(a => !a.day_type || a.day_type === 'roa' || a.day_type === 'sabotsy');
+
+                filteredActs.forEach(act => {
                     const s1 = dayAss.find(a => a.activity_id === act.id && a.slot_number === 1);
                     const s2 = dayAss.find(a => a.activity_id === act.id && a.slot_number === 2);
                     const p1 = s1 ? `<span class="print-avatar">${s1.assigned_user_name.charAt(0).toUpperCase()}</span>${s1.assigned_user_name}` : '<span class="print-empty">— tsy voatendry —</span>';
