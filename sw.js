@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fandaharana-v2'; // Changé à v2 pour forcer la mise à jour
+const CACHE_NAME = 'fandaharana-v3'; // Changé à v3 pour forcer la mise à jour des modifications (Asa vaovao jour)
 const urlsToCache = [
   './',
   './index.html',
